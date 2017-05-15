@@ -1,0 +1,286 @@
+{% extends '../Layout/layout.html' %}
+
+{% block crumbs %}
+地区管理/城市管理
+{% end %}
+
+{% block content %}
+
+<style>
+    .error-message{
+        margin: 4px 0 0 0;
+        padding: 0;
+        color: red;
+    }
+</style>
+<div>
+    <table id="dg"></table> 　　<!--#easyui订制table-->
+
+    <div id="dlg" class="easyui-dialog" style="width:400px;height:200px;padding:10px 20px" closed="true" buttons="#dlg-buttons"> <!--#easyui订制模态对话框，默认关闭状态-->
+        <form id="fm1">
+            <div class="input-group clearfix">
+                <div class="group-label" style="width: 80px;">
+                    <span>省份：</span>
+                </div>
+                <div class="group-input" style="width: 300px;">
+                    <select id="dlg_province" name="province_id">
+                    </select>
+                </div>
+                <div class="group-input" style="width: 300px;margin-top: 20px">
+                    <input id="dlg_nid" style="width: 200px;display: none"  name="nid"/>
+                    <input id="dlg_city" style="width: 200px" class="easyui-textbox" type="text" name="caption" data-options="required:true,missingMessage:'城市不能为空'" /> <!--#easyui订制form验证+错误信息提示-->
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="dlg-buttons">　　<!--easyui订制按钮-->
+        <span id="dlg_summary" style="color: red"></span>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="Save()">保存</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">取消</a>
+    </div>
+</div>
+<script>
+    $(function () {
+          // 加载表格数据
+          InitTable();  //初始化表格内容（即查询）
+          InitPagination();  //初始化分页
+          InitMenu(); //初始化左侧菜单
+          InitProvince();
+      });
+    /*
+        初始化左侧菜单
+        */
+    function InitProvince() {
+        $.ajax({
+            url:'/province.html',
+            type:'GET',
+            data:{'type':'all'},
+            dataType:'json',
+            success:function (data) {
+                console.log(data);
+                if(data.status){
+                    $.each(data.rows,function (k,v) {
+                        var option = document.createElement('option');
+                        option.setAttribute('value',v.nid);
+                        option.innerText = v.caption;
+                        $('#dlg_province').append(option)
+                    });
+                    $("option[value='3']").attr("selected",true);
+                }else {
+                    $.messager.alert('警告','省份初始化失败','warning');
+                }
+            }
+            }
+        )
+    }
+    /*
+        初始化左侧菜单
+        */
+    function InitMenu(){
+            $('#aa').accordion('select',1);  //easyui语法：选择左侧第0个标签
+            $('#jd_menu_city').addClass('active'); //让城市默认选中
+        }
+    /*
+      初始化分页
+       */
+    function InitPagination(){
+          var pager = $('#dg').datagrid('getPager');
+          $(pager).pagination({
+              beforePageText: '第',
+              afterPageText: '页 共{pages}页',
+              displayMsg: '当前显示{from}-{to}条记录 共{total}条数据'
+
+          })
+      }
+
+    function InitTable(){
+    $('#dg').datagrid({
+        title: '城市',
+        iconCls: 'icon-save', 　　//省份图标
+        url: '/City.html',  //获取数据的url
+        method: 'get', 　　//获取方式
+        //fitColumns: true,
+        idField: 'nid',　
+        singleSelect: true, //默认单选
+        rownumbers: true, //显示行号
+        striped: true, //奇数行与偶数行颜色有区别
+        columns:[[　　　　//每一列标题（easyui默认根据field将后端传来的数据按表格进行显示）
+            {
+                field:'ck',
+                checkbox:true  //显示checkbox
+            },
+            {
+                field:'nid',　　//从数据库获取的nid
+                title:'ID', //显示名称为ID
+                width:80, //宽度80px
+                align:'center'　　//居中显示
+            },
+            {
+                field:'caption',
+                title:'标题',
+                width:180,
+                align:'center'},
+            {
+                field:'province',
+                title:'所属省份',
+                width:180,
+                align:'center'},
+            {
+                field:'province_id',
+                title:'所属省份ID',
+                hidden:true}
+        ]],
+        toolbar: [　　//显示的按钮
+            {
+                text: '添加',  //按钮名称
+                iconCls: 'icon-add',  //按钮图标
+                handler: AddRow  //点击按钮后执行的返回函数
+            },{
+                text:'删除',
+                iconCls:'icon-remove',
+                handler: RemoveRow
+            },{
+                text:'修改',
+                iconCls:'icon-edit',
+                handler: EditRow
+            }
+        ],
+        pagePosition: 'both',　　//上下均显示分页
+        pagination:true, //显示分页
+        pageSize:10, //默认每页显示的数据总数
+        pageNumber: 1,　　//默认第一页
+        pageList: [10,20,50], //分页可选每页显示数量
+        loadFilter: function(data){ //过滤函数
+            return data;
+
+            }
+        });
+}
+var METHOD;
+/*
+    添加
+    */
+    function AddRow(){
+        // 显示对话框，由于希望添加则将方法设置为POST
+        $('#fm1').form('clear'); //清空上次form的内容
+        $('#dlg').dialog('open').dialog('setTitle','创建城市'); //设置模态对话框标签是创建城市
+        $('#dlg_summary').empty(); //清空错误信息
+        METHOD = 'post';　　//设置提交方式为post
+    }
+/*
+    保存按钮
+     */
+    function Save(){
+        var isValid = $('#fm1').form('validate');//前端form验证
+        if(isValid){
+            $.ajax({
+                url: '/City.html', //提交的url
+                type: METHOD,　　//根据之前定义的方法进行提交
+                data: {caption: $('#dlg_city').val(),nid:  $('#dlg_nid').val(),province_id:$('#dlg_province').val()}, //提交的数据
+                dataType: 'json', //数据格式
+                success: function(data){ //如果后端成功返回数据
+                    if(data.status){ //后端操作成功
+                        $('#fm1').form('clear'); //清空form内容
+                        $('#dlg').dialog('close'); //关闭模态对话框
+                        $('#dg').datagrid('reload'); //重新加载数据
+                    }else{
+                        $('#dlg_summary').text(data.summary); //否则显示错误信息
+                    }
+                }
+            })
+        }else{
+            // 前端验证通过
+        }
+        // $('#fm').form('clear');
+    }
+/*
+      修改
+      */
+  function EditRow(){
+      // 显示对话框，由于希望修改则将方法设置为PUT
+
+      // 获取选中的值，将其赋值到页面上，然后ajax提交
+      var row = $('#dg').datagrid('getSelected');
+      $('#dlg_summary').empty();
+      if(row){
+          METHOD = 'put';
+          $('#fm1').form('clear');
+          $('#fm1').form('load',row);
+          $('#dlg').dialog('open').dialog('setTitle','修改省份');
+
+      }else{
+          $.messager.alert('警告', '请选择要修改的行', 'warning');
+      }
+
+  }
+/*
+       删除
+       */
+       function RemoveRow(){
+           // 获取已经选中的行
+           var rows = $('#dg').datagrid('getSelections');
+           console.log(rows);
+           if(rows.length<=0){
+               // 警告框
+               $.messager.alert('警告', '请选择要删除的行', 'warning');
+           }else if(rows.length>1){
+               $.messager.alert('警告', '不支持批量删除');
+           }else{
+               // 确认框
+               $.messager.confirm('确定', '您确定要删除吗？', function (status) { //easyui订制的确认框
+                   if(status){
+                       // 点击确定
+                       // 获取当前选中行的值，Ajax发送到后台
+                       var row = rows[0];
+                       $.ajax({
+                           url: '/City.html',
+                           type: 'delete',
+                           data: {nid: row.nid},
+                           dataType: 'json',
+                           success: function (data) {
+                               if(data.status){
+                                   //删除成功
+                                   $.messager.show({  //easyui订制的messager框
+                                       msg:'删除成功',
+                                       showType:'slide', //淡出
+                                       showSpeed: 500, //速度
+                                       timeout: 5,  //显示5秒
+                                       style:{
+                                           right:'',
+                                           top:document.body.scrollTop+document.documentElement.scrollTop, //在屏幕上方显示
+                                           bottom:''
+                                       }
+                                   });
+                                   // 重新加载表格
+                                   var rowIndex = $('#dg').datagrid('getRowIndex', row);
+                                   $('#dg').datagrid('deleteRow',rowIndex);
+                                   $('#dg').datagrid('reload');
+
+                                   // 删除指定行
+                                   //var rowIndex = dt.datagrid('getRowIndex', row);
+                                   //dt.datagrid('deleteRow',rowIndex);
+
+                               }else{
+                                   //删除失败
+                                   // $.messager.alert('错误信息', data.summary ,'error');
+                                   $.messager.show({  //显示错误信息
+                                       icon: 'error',
+                                       title:'错误信息',
+                                       msg:data.summary,
+                                       showType:'slide',
+                                       timeout: 0,
+                                       style:{
+                                           right:'',
+                                           top:document.body.scrollTop+document.documentElement.scrollTop,
+                                           bottom:''
+                                       }
+                                   });
+                               }
+                           }
+                       });
+                   }
+               })
+           }
+       }
+</script>
+{% end %}

@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<!--当页面加载完成之后，通过JS给省添加一个样式-->
+<table class="easyui-datagrid" title="省份列表"
+       data-options="
+       pagination:true,
+       pagePosition:'both',
+       singleSelect:true,
+       url:'/province_data',
+       method:'get'">
+    <thead>
+        <tr>
+            <th data-options="field:'nid',width:80">ID</th>
+            <th data-options="field:'caption',width:100">省份</th>
+        </tr>
+    </thead>
+</table>
+{% end %}
+{% block js %}
+<script>
+    //当页面加载完成时
+    $(function () {
+        $('#province').addClass('active');
+        $('#aa').accordion('select','区域管理')
+    })
+</script>
+{% end %}

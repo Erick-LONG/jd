@@ -1,0 +1,30 @@
+{% extends '../Layout/layout.html' %}
+
+{% block content %}
+<!--当页面加载完成之后，通过JS给省添加一个样式-->
+<table id="tb" class="easyui-datagrid" ></table>
+{% end %}
+{% block js %}
+<script>
+    //当页面加载完成时
+    $(function () {
+        $('#province').addClass('active');
+        $('#aa').accordion('select','区域管理');
+        InitTable();
+    });
+    function InitTable() {
+        $('#tb').datagrid({
+				url: '/province_data',
+				method: 'get',
+				title: '省份列表',
+				singleSelect: true,
+                pagination:true,
+                pagePosition:'both',
+				columns:[[
+					{field:'nid',title:'ID',width:80},
+					{field:'caption',title:'省份',width:120},
+				]]
+			});
+    }
+</script>
+{% end %}

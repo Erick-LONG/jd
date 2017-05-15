@@ -1,0 +1,66 @@
+任务1：
+    实现后台管理
+        用户管理（CURD）
+        商户管理（CURD）
+        三级菜单（省市县）（CURD）
+        \\上传商品（标题，图片。。）
+
+    后端：JD 架子
+    前端：easyUI
+
+一、需求分析
+二、数据库设计
+三、功能实现
+    后端：JD 架子
+    前端：easyUI
+
+
+目录结构
+repository  - 数据仓库
+            *数据库操作 --------------4
+model     - 业务处理
+            *接口
+            *模型
+            *协调（服务）-----------3
+adminui
+    controller
+        *类 -----------2
+            def post
+            def get
+            ...
+    views --------1
+业务调用数据仓库，业务处理里的接口调用数据仓库
+
+2 、数据库部分表
+    5个表
+3、业务逻辑
+
+
+1、easyui 布局
+2、左侧菜单
+        -左侧菜单
+
+         -easy ui 布局
+         $('#aa').accordion('select','区域管理')
+         Demo
+         文档
+         自己写
+数据表格
+
+方式一、
+1、用户输入url: /province.html    provincehandeler
+2、handler ->get方法：
+    ret = 从数据库中获取数据
+    self.render('province.html',{ret})
+方式二、
+1、用户输入url: /province.html
+2、handler ->get方法：
+    self.render('province.html')
+    -----用户看到空页面---------
+3、发一个Ajax请求(获取数据 type：get) url :/provincedata.html ->provincedatahandeler
+去数据库中获取数据
+[{'nid':1,'caption':'四川'}，
+{'nid':2,'caption':'河北'}，
+{'nid':3,'caption':'北京'}，
+]
+:$.each()
