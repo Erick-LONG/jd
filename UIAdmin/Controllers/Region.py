@@ -326,3 +326,53 @@ class CountyHandler(tornado.web.RequestHandler):
                 ret['summary'] = str(e)
 
         self.write(json.dumps(ret))  # 返回给前端
+    def put(self, *args, **kwargs):
+        """
+        更新
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        ret = {'status': False, 'summary': ''}
+        nid = self.get_argument('nid', None)
+        caption = self.get_argument('caption', None)
+        city_id = self.get_argument('city_id',None)
+        if not caption or not nid:
+            ret['summary'] = '城市不能为空'
+        else:
+            try:
+
+                region_service = RegionService(RegionRepository())
+                result = region_service.modify_country(nid, caption,city_id)
+
+                if not result:
+                    ret['summary'] = '城市已经存在'
+                else:
+                    ret['status'] = True
+            except Exception as e:
+                ret['summary'] = str(e)
+        self.write(json.dumps(ret))
+
+    def delete(self, *args, **kwargs):
+        """
+        删除
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        ret = {'status': False, 'summary': ''}
+
+        nid = self.get_argument('nid', None)
+
+        if not nid:
+            ret['summary'] = '请选择要删除的县'
+        else:
+            # 调用service去删除吧...
+            # 如果删除失败，则显示错误信息
+            try:
+                region_service = RegionService(RegionRepository())
+                region_service.delete_country(nid)  # 根据nid删除县
+                ret['status'] = True
+            except Exception as e:
+                ret['summary'] = str(e)
+        self.write(json.dumps(ret))
