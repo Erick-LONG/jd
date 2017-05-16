@@ -94,3 +94,10 @@ class RegionService:
 
         result = self.regionRepository.fetch_country_by_page(start, offset)
         return result
+    def delete_country(self, nid):
+        self.regionRepository.remove_country(nid)
+    def modify_country(self, nid, caption,city_id):
+        exist = self.regionRepository.exist_country(caption)
+        if not exist:
+            self.regionRepository.update_country(nid, caption,city_id)  # 更新县
+            return True
