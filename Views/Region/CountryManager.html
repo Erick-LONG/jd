@@ -27,12 +27,15 @@
                         <option value ='0' selected="selected">请选择省</option>
                     </select>
                 </div>
-                <div class="group-input" style="width: 300px;margin-top: 15px">
+                <div class="group-label" style="width: 80px;">
+                    <span>城市：</span>
+                </div>
+                <div class="group-input" style="width: 300px;margin-top: 5px">
                     <select id="dlg_city" name="city_id">
                         <option value ='0' selected="selected">请选择市</option>
                     </select>
                 </div>
-                <div class="group-input" style="width: 300px;margin-top: 15px">
+                <div class="group-input" style="width: 300px;margin-top: 5px">
                     <input id="dlg_nid" style="width: 200px;display: none"  name="nid"/>
                     <input id="dlg_country" style="width: 200px" class="easyui-textbox" type="text" name="caption" data-options="required:true,missingMessage:'县不能为空'" /> <!--#easyui订制form验证+错误信息提示-->
                 </div>
@@ -250,7 +253,6 @@ var METHOD;
       */
   function EditRow(){
       // 显示对话框，由于希望修改则将方法设置为PUT
-
       // 获取选中的值，将其赋值到页面上，然后ajax提交
       var row = $('#dg').datagrid('getSelected');
       $('#dlg_summary').empty();
@@ -258,7 +260,7 @@ var METHOD;
           METHOD = 'put';
           $('#fm1').form('clear');
           $('#fm1').form('load',row);
-          $('#dlg').dialog('open').dialog('setTitle','修改省份');
+          $('#dlg').dialog('open').dialog('setTitle','修改县');
 
       }else{
           $.messager.alert('警告', '请选择要修改的行', 'warning');
@@ -285,7 +287,7 @@ var METHOD;
                        // 获取当前选中行的值，Ajax发送到后台
                        var row = rows[0];
                        $.ajax({
-                           url: '/City.html',
+                           url: '/Country.html',
                            type: 'delete',
                            data: {nid: row.nid},
                            dataType: 'json',
