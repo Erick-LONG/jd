@@ -161,3 +161,16 @@ class RegionRepository(IRegionRepository):
         db_result = cursor.fetchall()
         self.db_conn.close()
         return db_result
+    def remove_country(self, nid):
+        cursor = self.db_conn.conncet()
+        sql = """delete from county where nid=%s """
+        effect_rows = cursor.execute(sql, (nid,))
+        self.db_conn.close()
+        return effect_rows
+
+    def update_country(self, nid, caption, city_id):  # 更新县
+        cursor = self.db_conn.conncet()
+        sql = """update county set caption=%s,city_id=%s where nid=%s """
+        effect_rows = cursor.execute(sql, (caption, city_id, nid))
+        self.db_conn.close()
+        return effect_rows
