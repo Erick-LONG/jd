@@ -96,7 +96,7 @@ class RegionService:
         return result
     def delete_country(self, nid):
         self.regionRepository.remove_country(nid)
-    def modify_country(self, nid, caption,city_id):
+    def modify_country(self, nid, caption,city_id): #修改县
         exist = self.regionRepository.exist_country(caption)
         if not exist:
             self.regionRepository.update_country(nid, caption,city_id)  # 更新县
