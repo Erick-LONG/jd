@@ -93,6 +93,26 @@
             }
         })
     }
+    function Gttcity() {
+        var provinceId = $('#dlg_province').val();
+         $.ajax({
+                    url:'City.html',
+                    type:'get',
+                    data:{'type':'province','province_id':provinceId},
+                    dataType:'json',
+                    success:function (data) {
+                        if (data.status){
+                            $('#dlg_city option:gt(0)').remove();
+                            $.each(data.rows,function (k,v) {
+                                var option = document.createElement('option');
+                                option.setAttribute('value',v.nid);
+                                option.innerText = v.caption;
+                                $('#dlg_city').append(option)
+                            });
+                        }else {
+                            $.messager.alert('获取城市列表失败',data.message,'warning')
+                        }
+    }})}
     /*
         初始化左侧菜单
         */
@@ -253,9 +273,11 @@ var METHOD;
       */
   function EditRow(){
       // 显示对话框，由于希望修改则将方法设置为PUT
+
       // 获取选中的值，将其赋值到页面上，然后ajax提交
       var row = $('#dg').datagrid('getSelected');
       $('#dlg_summary').empty();
+      Gttcity();
       if(row){
           METHOD = 'put';
           $('#fm1').form('clear');
